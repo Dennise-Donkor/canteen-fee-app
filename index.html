@@ -1,185 +1,155 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Canteen Fee Collection</title>
+  <title>Payment List</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #f9f9f9;
       margin: 0;
-      padding: 0;
+      padding: 20px;
     }
 
     .container {
-      max-width: 600px;
-      margin: 40px auto;
+      max-width: 700px;
+      margin: auto;
       background: #fff;
       padding: 24px;
       border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
-    h1 {
-      text-align: center;
+    h2 {
       color: #333;
+      margin-top: 30px;
     }
 
-    form label {
-      display: block;
-      margin-top: 15px;
+    ul {
+      list-style: none;
+      padding-left: 0;
     }
 
-    input, select, button {
-      width: 100%;
+    li {
+      background: #f1f1f1;
+      margin-bottom: 8px;
       padding: 10px;
-      margin-top: 5px;
-      font-size: 16px;
-      border: 1px solid #ccc;
       border-radius: 6px;
     }
 
-    button {
+    .section {
+      margin-top: 30px;
+    }
+
+    .total {
+      font-weight: bold;
       margin-top: 20px;
+    }
+
+    .btn-bar {
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #clearBtn {
+      background-color: #e53e3e;
+      color: white;
+    }
+
+    #printBtn {
       background-color: #0078d4;
       color: white;
-      font-weight: bold;
-      cursor: pointer;
     }
 
-    #viewPaymentsBtn {
+    #backBtn {
       background-color: #4caf50;
-    }
-
-    #passwordGate {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #f6f8fa;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-
-    #passwordGate > div {
-      background: #fff;
-      padding: 32px 24px;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-      text-align: center;
-    }
-
-    #pwError {
-      color: #e53e3e;
-      margin-top: 10px;
-      display: none;
+      color: white;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>Today's Payments</h1>
+    <div id="paymentList"></div>
+    <h3 class="total" id="totalDisplay">Total Collected Today: GHS 0.00</h3>
 
-  <!-- PASSWORD GATE -->
-  <div id="passwordGate">
-    <div>
-      <h2>Enter Password</h2>
-      <input type="password" id="pwInput" placeholder="Password">
-      <button id="pwBtn">Submit</button>
-      <div id="pwError">Incorrect password.</div>
+    <div class="btn-bar">
+      <button id="clearBtn">Clear Payments</button>
+      <button id="printBtn">Print</button>
+      <button id="backBtn">Back to Form</button>
     </div>
   </div>
 
-  <!-- MAIN APP -->
-  <div class="container" style="display: none;">
-    <h1>Canteen Fee Collection</h1>
-    <p style="text-align:center; color:#555;">
-      Welcome! Please record payments below. Thank you for helping keep our canteen running smoothly.
-    </p>
-
-    <form id="paymentForm">
-      <label for="studentName">Student Name:</label>
-      <input type="text" id="studentName" required>
-
-      <label for="amountPaid">Amount Paid (GHS):</label>
-      <input type="number" id="amountPaid" required>
-
-      <label for="studentClass">Class:</label>
-      <select id="studentClass" required>
-        <option value="">-- Select Class --</option>
-        <option value="Class 1">Class 1</option>
-        <option value="Class 2">Class 2</option>
-        <option value="Class 3">Class 3</option>
-        <option value="Class 4">Class 4</option>
-        <option value="Class 5">Class 5</option>
-        <option value="Class 6">Class 6</option>
-        <option value="JHS 1">JHS 1</option>
-        <option value="JHS 2">JHS 2</option>
-        <option value="JHS 3">JHS 3</option>
-      </select>
-
-      <label for="paymentDate">Date:</label>
-      <input type="date" id="paymentDate" required>
-
-      <button type="submit">Submit Payment</button>
-    </form>
-
-    <button id="viewPaymentsBtn">View Payment List</button>
-  </div>
-
   <script>
-    // Password gate logic
-    document.addEventListener("DOMContentLoaded", function () {
-      const gate = document.getElementById("passwordGate");
-      const main = document.querySelector(".container");
-      const pwBtn = document.getElementById("pwBtn");
-      const pwInput = document.getElementById("pwInput");
-      const pwError = document.getElementById("pwError");
+    // Group and display payments
+    const paymentList = document.getElementById("paymentList");
+    const storedPayments = JSON.parse(localStorage.getItem("payments")) || [];
 
-      pwBtn.onclick = function () {
-        if (pwInput.value === "canteen2025") {
-          gate.style.display = "none";
-          main.style.display = "";
-        } else {
-          pwError.style.display = "block";
-          pwInput.value = "";
-        }
-      };
+    const classGroups = {};
+    let total = 0;
 
-      pwInput.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") pwBtn.click();
+    storedPayments.forEach(payment => {
+      if (!classGroups[payment.class]) {
+        classGroups[payment.class] = [];
+      }
+      classGroups[payment.class].push(payment);
+      total += payment.amount;
+    });
+
+    for (let className in classGroups) {
+      const section = document.createElement("div");
+      section.className = "section";
+
+      const header = document.createElement("h2");
+      header.textContent = `${className} (Total: GHS ${classGroups[className]
+        .reduce((sum, p) => sum + p.amount, 0)
+        .toFixed(2)})`;
+      section.appendChild(header);
+
+      const ul = document.createElement("ul");
+      classGroups[className].forEach(p => {
+        const li = document.createElement("li");
+        li.textContent = `${p.name} paid GHS ${p.amount.toFixed(2)} on ${p.date}`;
+        ul.appendChild(li);
       });
 
-      const paymentDate = document.getElementById("paymentDate");
-      if (paymentDate) {
-        const today = new Date().toISOString().split("T")[0];
-        paymentDate.value = today;
-      }
-    });
-
-    // Handle form submission
-    const form = document.getElementById("paymentForm");
-    form.addEventListener("submit", function (event) {
-      event.preventDefault();
-
-      const name = document.getElementById("studentName").value;
-      const amount = parseFloat(document.getElementById("amountPaid").value);
-      const studentClass = document.getElementById("studentClass").value;
-      const date = document.getElementById("paymentDate").value;
-
-      const newPayment = { name, amount, class: studentClass, date };
-      let payments = JSON.parse(localStorage.getItem("payments")) || [];
-      payments.push(newPayment);
-      localStorage.setItem("payments", JSON.stringify(payments));
-
-      form.reset();
-    });
-
-    // View payments button
-    document.getElementById("viewPaymentsBtn").onclick = function () {
-      window.location.href = "payments.html";
-    };
+      section.appendChild(ul);
+      paymentList.appendChild(section);
+    }
   </script>
 
+  <p><a href="class-list.html">📘 View Payments by Class</a></p>
+
+  <script>
+    document.getElementById("totalDisplay").textContent = `Total Collected Today: GHS ${total.toFixed(2)}`;
+
+    // Clear
+    document.getElementById("clearBtn").onclick = function () {
+      if (confirm("Are you sure you want to clear all payments?")) {
+        localStorage.removeItem("payments");
+        location.reload();
+      }
+    };
+
+    // Print
+    document.getElementById("printBtn").onclick = function () {
+      window.print();
+    };
+
+    // Back to form
+    document.getElementById("backBtn").onclick = function () {
+      window.location.href = "payment-form.html";
+    };
+  </script>
 </body>
 </html>
