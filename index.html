@@ -90,9 +90,19 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="passwordGate" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#f6f8fa;display:flex;align-items:center;justify-content:center;z-index:9999;">
+        <div style="background:#fff;padding:32px 24px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.07);text-align:center;">
+            <h2 style="margin-bottom:18px;color:#333;">Enter Password</h2>
+            <input type="password" id="pwInput" placeholder="Password" style="padding:10px;width:100%;margin-bottom:16px;border-radius:6px;border:1px solid #d1d5db;font-size:1rem;">
+            <button id="pwBtn" style="background:#0078d4;color:#fff;border:none;padding:10px 24px;border-radius:6px;font-weight:bold;cursor:pointer;">Submit</button>
+            <div id="pwError" style="color:#e53e3e;margin-top:10px;display:none;">Incorrect password.</div>
+        </div>
+    </div>
+    <div class="container" style="display:none;">
         <h1>Canteen Fee Collection</h1>
-        <p>Enter the details below to record a payment:</p>
+        <p style="text-align:center; color:#555; margin-bottom:18px;">
+            Welcome! Please record payments below. Thank you for helping keep our canteen running smoothly.
+        </p>
 
         <form id="paymentForm">
         <label for="studentName">Student Name:</label>
@@ -273,6 +283,30 @@
                 const today = new Date().toISOString().split("T")[0];
                 paymentDate.value = today;
             }
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const gate = document.getElementById("passwordGate");
+            const main = document.querySelector(".container");
+            const pwBtn = document.getElementById("pwBtn");
+            const pwInput = document.getElementById("pwInput");
+            const pwError = document.getElementById("pwError");
+
+            pwBtn.onclick = function() {
+                if (pwInput.value === "canteen2025") {
+                    gate.style.display = "none";
+                    main.style.display = "";
+                } else {
+                    pwError.style.display = "block";
+                    pwInput.value = "";
+                }
+            };
+
+            pwInput.addEventListener("keydown", function(e) {
+                if (e.key === "Enter") pwBtn.click();
+            });
         });
     </script>
 
