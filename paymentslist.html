@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Today's Payments</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Today's Payments</h1>
+    <div id="paymentList"></div>
+    <h3 id="totalDisplay">Total Collected Today: GHS 0</h3>
+    <a href="index.html">← Back to payment form</a>
+  </div>
+
+  <script>
+    const paymentList = document.getElementById("paymentList");
+    const totalDisplay = document.getElementById("totalDisplay");
+
+    const storedPayments = JSON.parse(localStorage.getItem("payments")) || [];
+
+    const paymentsByClass = {};
+    let totalAmount = 0;
+
+    storedPayments.forEach(payment => {
+      if (!paymentsByClass[payment.class]) {
+        paymentsByClass[payment.class] = [];
+      }
+      paymentsByClass[payment.class].push(payment);
+      totalAmount += parseFloat(payment.amount);
+    });
+
+    for (const className in paymentsByClass) {
+      const classSection = document.createElement("div");
+      const totalPerClass = paymentsByClass[className]
+        .reduce((sum, p) => sum + parseFloat(p.amount), 0)
+        .toFixed(2);
+
+      classSection.innerHTML = `<h3>${className} (Total: GHS ${totalPerClass})</h3>`;
+      const ul = document.createElement("ul");
+
+      paymentsByClass[className].forEach(payment => {
+        const li = document.createElement("li");
+        li.textContent = `${payment.name} paid GHS ${parseFloat(payment.amount).toFixed(2)} on ${payment.date}`;
+        ul.appendChild(li);
+      });
+
+      classSection.appendChild(ul);
+      paymentList.appendChild(classSection);
+    }
+
+    totalDisplay.textContent = `Total Collected Today: GHS ${totalAmount.toFixed(2)}`;
+  </script>
+</body>
+</html>
