@@ -19,6 +19,11 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+
     h2 {
       color: #333;
       margin-top: 30px;
@@ -80,71 +85,27 @@
 <body>
   <div class="container">
     <h1>Today's Payments</h1>
-    <div id="paymentList"></div>
     <h3 class="total" id="totalDisplay">Total Collected Today: GHS 0.00</h3>
 
     <div class="btn-bar">
-      <button id="clearBtn">Clear Payments</button>
-      <button id="printBtn">Print</button>
       <button id="backBtn">Back to Form</button>
     </div>
   </div>
 
   <script>
-    // Group and display payments
-    const paymentList = document.getElementById("paymentList");
+    // Calculate and show total payment for today
+    const totalDisplay = document.getElementById("totalDisplay");
     const storedPayments = JSON.parse(localStorage.getItem("payments")) || [];
+    const today = new Date().toISOString().split("T")[0];
 
-    const classGroups = {};
     let total = 0;
-
     storedPayments.forEach(payment => {
-      if (!classGroups[payment.class]) {
-        classGroups[payment.class] = [];
+      if (payment.date === today) {
+        total += payment.amount;
       }
-      classGroups[payment.class].push(payment);
-      total += payment.amount;
     });
 
-    for (let className in classGroups) {
-      const section = document.createElement("div");
-      section.className = "section";
-
-      const header = document.createElement("h2");
-      header.textContent = `${className} (Total: GHS ${classGroups[className]
-        .reduce((sum, p) => sum + p.amount, 0)
-        .toFixed(2)})`;
-      section.appendChild(header);
-
-      const ul = document.createElement("ul");
-      classGroups[className].forEach(p => {
-        const li = document.createElement("li");
-        li.textContent = `${p.name} paid GHS ${p.amount.toFixed(2)} on ${p.date}`;
-        ul.appendChild(li);
-      });
-
-      section.appendChild(ul);
-      paymentList.appendChild(section);
-    }
-  </script>
-
-  <p><a href="class-list.html">📘 View Payments by Class</a></p>
-
-  <script>
-    document.getElementById("totalDisplay").textContent = `Total Collected Today: GHS ${total.toFixed(2)}`;
-
-    // Clear
-    document.getElementById("clearBtn").onclick = function () {
-      if (confirm("Are you sure you want to clear all payments?")) {
-        localStorage.removeItem("payments");
-        location.reload();
-      }
-    };
-
-    // Print
-    document.getElementById("printBtn").onclick = function () {
-      window.print();
-    };
+    totalDisplay.textContent = `Total Collected Today: GHS ${total.toFixed(2)}`;
 
     // Back to form
     document.getElementById("backBtn").onclick = function () {
