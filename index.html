@@ -140,6 +140,9 @@
             <button id="exportButton" style="background-color: green; color: white; padding: 8px; border: none; border-radius: 4px; margin-top: 10px;">
             Export to CSV
         </button>
+        <button id="viewPaymentsBtn" style="background:#38a169;color:#fff;border:none;padding:10px 24px;border-radius:6px;font-weight:bold;cursor:pointer;margin-top:10px;">
+            View Payment List
+        </button>
         </div>
     </div>
 
@@ -295,6 +298,7 @@
             const pwError = document.getElementById("pwError");
 
             pwBtn.onclick = function() {
+            
                 if (pwInput.value === "canteen2025") {
                     gate.style.display = "none";
                     main.style.display = "";
