@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>View by Class</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    li {
+      background: #e0f7fa;
+      margin-bottom: 8px;
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    #backBtn {
+      margin-top: 20px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>View Payments by Class</h1>
+
+    <label for="classSelector">Choose a Class:</label>
+    <select id="classSelector">
+      <option value="">-- Select Class --</option>
+      <option value="Class 1">Class 1</option>
+      <option value="Class 2">Class 2</option>
+      <option value="Class 3">Class 3</option>
+      <option value="Class 4">Class 4</option>
+      <option value="Class 5">Class 5</option>
+      <option value="Class 6">Class 6</option>
+      <option value="JHS 1">JHS 1</option>
+      <option value="JHS 2">JHS 2</option>
+      <option value="JHS 3">JHS 3</option>
+    </select>
+
+    <ul id="classPaymentList"></ul>
+
+    <button id="backBtn">Back to Main</button>
+  </div>
+
+  <script>
+    const classSelector = document.getElementById("classSelector");
+    const paymentList = document.getElementById("classPaymentList");
+
+    classSelector.addEventListener("change", () => {
+      const selectedClass = classSelector.value;
+      paymentList.innerHTML = "";
+
+      if (!selectedClass) return;
+
+      const payments = JSON.parse(localStorage.getItem("payments")) || [];
+      const classPayments = payments.filter(p => p.class === selectedClass);
+
+      if (classPayments.length === 0) {
+        paymentList.innerHTML = "<li>No payments found for this class.</li>";
+        return;
+      }
+
+      classPayments.forEach(p => {
+        const li = document.createElement("li");
+        li.textContent = `${p.name} paid GHS ${p.amount.toFixed(2)} on ${p.date}`;
+        paymentList.appendChild(li);
+      });
+    });
+
+    document.getElementById("backBtn").onclick = function () {
+      window.location.href = "index.html";
+    };
+  </script>
+</body>
+</html>
