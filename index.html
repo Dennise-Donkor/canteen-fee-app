@@ -1,7 +1,14 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Canteen Fee Collection</title>
+
+  <!-- ✅ Bootstrap CSS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -67,6 +74,19 @@
       color: #0078d4;
       text-decoration: none;
       font-weight: bold;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    #clearPaymentsBtn {
+      margin-top: 10px;
+      background: #e53e3e;
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
     }
 
     #passwordGate {
@@ -88,12 +108,37 @@
       border-radius: 12px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.07);
       text-align: center;
+      max-width: 90%;
     }
 
     #pwError {
       color: #e53e3e;
       margin-top: 10px;
       display: none;
+    }
+
+    .features {
+      margin-top: 40px;
+    }
+
+    .features h5 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .features ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .features li::before {
+      content: "✔️";
+      margin-right: 8px;
+    }
+
+    .features li {
+      margin-bottom: 8px;
+      color: #333;
     }
   </style>
 </head>
@@ -143,13 +188,24 @@
     <div id="totalToday">Total Collected Today: GHS 0.00</div>
 
     <div id="viewLink">
-      <p><a href="paymentslist.html">📋 View Full Payment List</a></p>
-      <p><a href="class-list.html">📘 View Payments by Class</a></p>
+      <a href="paymentslist.html">📋 View Full Payment List</a>
+      <a href="class-list.html">📘 View Payments by Class</a>
     </div>
 
-    <button id="clearPaymentsBtn" style="margin-top:10px;background:#e53e3e;color:#fff;border:none;padding:10px 24px;border-radius:6px;font-weight:bold;cursor:pointer;">
-      Clear All Payments
-    </button>
+    <button id="clearPaymentsBtn">Clear All Payments</button>
+
+    <!-- ✅ App Features Section -->
+    <div class="features">
+      <h5>App Features</h5>
+      <ul>
+        <li>Add and track student payments</li>
+        <li>View full payment history</li>
+        <li>Manage payments by class</li>
+        <li>Daily total collection summary</li>
+        <li>Mobile and desktop friendly</li>
+      </ul>
+    </div>
+
   </div>
 
   <script>
@@ -211,7 +267,7 @@
       document.getElementById("totalToday").textContent = `Total Collected Today: GHS ${total.toFixed(2)}`;
     }
 
-    // Clear payments button
+    // Clear payments
     document.getElementById("clearPaymentsBtn").onclick = function () {
       if (confirm("Are you sure you want to clear all payments?")) {
         localStorage.removeItem("payments");
