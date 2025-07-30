@@ -52,6 +52,12 @@
       cursor: pointer;
       font-weight: bold;
     }
+
+    #classSummary {
+      font-weight: bold;
+      margin-top: 20px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -74,16 +80,20 @@
 
     <ul id="classPaymentList"></ul>
 
+    <div id="classSummary" style="margin-top:20px; font-weight:bold;"></div>
+
     <button id="backBtn">Back to Main</button>
   </div>
 
   <script>
     const classSelector = document.getElementById("classSelector");
     const paymentList = document.getElementById("classPaymentList");
+    const classSummary = document.getElementById("classSummary");
 
     classSelector.addEventListener("change", () => {
       const selectedClass = classSelector.value;
       paymentList.innerHTML = "";
+      classSummary.textContent = "";
 
       if (!selectedClass) return;
 
@@ -100,6 +110,11 @@
         li.textContent = `${p.name} paid GHS ${p.amount.toFixed(2)} on ${p.date}`;
         paymentList.appendChild(li);
       });
+
+      // Calculate summary
+      const totalAmount = classPayments.reduce((sum, p) => sum + p.amount, 0);
+      const uniqueStudents = new Set(classPayments.map(p => p.name)).size;
+      classSummary.textContent = `Total Amount: GHS ${totalAmount.toFixed(2)} | Number of Students Paid: ${uniqueStudents} | Total Payments: ${classPayments.length}`;
     });
 
     document.getElementById("backBtn").onclick = function () {
